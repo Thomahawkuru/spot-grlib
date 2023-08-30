@@ -1,5 +1,5 @@
 # spot-grlib
-Boston dynamics SPOT control using grlib.
+Boston dynamics SPOT control using [grlib](https://github.com/mikhail-vlasenko/grlib)
 
 
 ## install
