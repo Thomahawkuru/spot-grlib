@@ -8,6 +8,7 @@ python main.py
 ## Create data
 set lable name in creat_data.py, then run:  
 sudo python create_data.py  
+Shoot training images of specific gestures with space bar
 
 ## Run Main script
 export BOSDYN_CLIENT_USERNAME=<user>  
