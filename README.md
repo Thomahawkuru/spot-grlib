@@ -4,7 +4,7 @@ Boston dynamics SPOT control using [grlib](https://github.com/mikhail-vlasenko/g
 
 ## install
 sudo pip install -r requirements.txt  
-python main.py  
+
 ## Create data
 set lable name in creat_data.py, then run:  
 sudo python create_data.py  
