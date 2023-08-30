@@ -9,7 +9,6 @@ charset-normalizer==2.1.1
 Deprecated==1.2.13
 grpcio==1.50.0
 idna==3.4
-numpy==1.23.4
 opencv-python==4.5.5.64
 Pillow==9.3.0
 protobuf==4.21.9
@@ -18,5 +17,7 @@ requests==2.28.1
 six==1.16.0
 urllib3==1.26.12
 wrapt==1.14.1
-sklearn
+scikit-learn~=1.2.2
 python-dotenv
+keyboard
+git+https://github.com/mikhail-vlasenko/grlib.git
