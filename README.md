@@ -12,4 +12,4 @@ sudo python create_data.py
 ## Run Main script
 export BOSDYN_CLIENT_USERNAME=<user>
 export BOSDYN_CLIENT_PASSWORD=<password> 
-sudo python main.py -m 192.168.80.3
+python main.py
