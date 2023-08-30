@@ -188,6 +188,7 @@ class WasdInterface(object):
         self._robot = robot
         # Create clients -- do not use the for communication yet.
         self._lease_client = robot.ensure_client(LeaseClient.default_service_name)
+        self._lease_client.take()
         try:
             self._estop_client = self._robot.ensure_client(EstopClient.default_service_name)
             self._estop_endpoint = EstopEndpoint(self._estop_client, 'GNClient', 9.0)
