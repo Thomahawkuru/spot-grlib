@@ -1,4 +1,5 @@
 import numpy as np
+import grlib
 from grlib.exceptions import NoHandDetectedException
 from grlib.load_data.by_folder_loader import ByFolderLoader
 from grlib.feature_extraction.pipeline import Pipeline
@@ -16,14 +17,14 @@ from dotenv import load_dotenv
 import os
 import io
 from PIL import Image
-import cv2.cv2 as cv
+import cv2 as cv
 import time
 
 
 def create_classifier(pipeline):
     # Create, train and test a model for static gesture recognition
-    loader = ByFolderLoader(pipeline, path='./out', max_hands=1)
-    #loader.create_landmarks()
+    loader = ByFolderLoader(pipeline, path='./out')
+    loader.create_landmarks()
 
     dataset = loader.load_landmarks()
     X = dataset.iloc[:, :63]
@@ -60,12 +61,20 @@ def move_right(command_client):
     cmd = RobotCommandBuilder.synchro_velocity_command(0, 0.4, 0)
     command_client.robot_command(cmd, end_time_secs=time.time() + 3)
 
-
 def move_left(command_client):
     # velocity_command is deprecated so we will see what happens
     cmd = RobotCommandBuilder.synchro_velocity_command(0, -0.4, 0)
     command_client.robot_command(cmd, end_time_secs=time.time() + 3)
 
+def move_front(command_client):
+    # velocity_command is deprecated so we will see what happens
+    cmd = RobotCommandBuilder.synchro_velocity_command(0.4, 0, 0)
+    command_client.robot_command(cmd, end_time_secs=time.time() + 3)
+
+def move_back(command_client):
+    # velocity_command is deprecated so we will see what happens
+    cmd = RobotCommandBuilder.synchro_velocity_command(-0.4, 0, 0)
+    command_client.robot_command(cmd, end_time_secs=time.time() + 3)
 
 def stop(command_client):
     cmd = RobotCommandBuilder.stop_command()
@@ -73,7 +82,7 @@ def stop(command_client):
 
 
 def recognize_gestures(robot, model, pipeline, fp_filter):
-    secondary_pipeline = Pipeline(4)
+    secondary_pipeline = Pipeline(1)
     secondary_pipeline.add_stage(0, 0)
 
     # Initialize an ImageClient
@@ -99,7 +108,7 @@ def recognize_gestures(robot, model, pipeline, fp_filter):
             # detect hands on the picture. You can detect more hands than you intend to recognize
             landmarks, handedness = secondary_pipeline.get_world_landmarks_from_image(image)
             # drop non-suiting ones
-            landmarks, handedness = fp_filter.drop_wrong_hands(landmarks, handedness)
+            #landmarks, handedness = fp_filter.drop_wrong_hands(landmarks, handedness)
             secondary_pipeline.optimize()
 
             if len(landmarks) != 0:
@@ -110,6 +119,10 @@ def recognize_gestures(robot, model, pipeline, fp_filter):
                     move_left(command_client)
                 elif prediction == 'right':
                     move_right(command_client)
+                elif prediction == 'front':
+                    move_front(command_client)
+                elif prediction == 'backk':
+                    move_back(command_client)
                 elif prediction == 'stop':
                     stop(command_client)
                 elif prediction == 'up':
@@ -135,7 +148,7 @@ def main():
 
     # Set up the boston dynamics SPOT (based on hello_spot.py)
     sdk = bosdyn.client.create_standard_sdk('HelloSpotClient')
-    robot = sdk.create_robot(os.getenv('hostname'))
+    robot = sdk.create_robot('192.168.80.30') #192.168.51,157
     bosdyn.client.util.authenticate(robot)
     robot.time_sync.wait_for_sync()
 
@@ -144,9 +157,12 @@ def main():
 
     # Power on and start controlling the robot
     lease_client = robot.ensure_client(bosdyn.client.lease.LeaseClient.default_service_name)
+    lease_client.take()
     with bosdyn.client.lease.LeaseKeepAlive(lease_client, must_acquire=True, return_at_exit=True):
-        robot.power_on(timeout_sec=20)
+        robot.power_on(timeout_sec=10)
         assert robot.is_powered_on(), "Robot power on failed."
+        command_client = robot.ensure_client(RobotCommandClient.default_service_name)
+        blocking_stand(command_client, timeout_sec=2)
 
         # Create false-positive filter to recognize only meaningful gestures
         fp_filter = FalsePositiveFilter(dataset, confidence=0.8)
