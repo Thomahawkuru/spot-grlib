@@ -121,7 +121,7 @@ def recognize_gestures(robot, model, pipeline, fp_filter):
                     move_right(command_client)
                 elif prediction == 'front':
                     move_front(command_client)
-                elif prediction == 'backk':
+                elif prediction == 'back':
                     move_back(command_client)
                 elif prediction == 'stop':
                     stop(command_client)
@@ -148,7 +148,7 @@ def main():
 
     # Set up the boston dynamics SPOT (based on hello_spot.py)
     sdk = bosdyn.client.create_standard_sdk('HelloSpotClient')
-    robot = sdk.create_robot('192.168.80.30') #192.168.51,157
+    robot = sdk.create_robot('192.168.51.157') #192.168.51,157
     bosdyn.client.util.authenticate(robot)
     robot.time_sync.wait_for_sync()
 
